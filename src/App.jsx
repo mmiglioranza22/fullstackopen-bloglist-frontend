@@ -7,6 +7,7 @@ const App = () => {
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [newBlog, setNewBlog] = useState({ author: "", title: "", url: "" });
   const [user, setUser] = useState(null);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const loggedUser = window.localStorage.getItem("loggedUser");
@@ -32,12 +33,25 @@ const App = () => {
   };
 
   const handleLogin = (e) => {
+    let timer;
     e.preventDefault();
-    blogService.login(loginData).then((response) => {
-      blogService.setToken(response.token);
-      window.localStorage.setItem("loggedUser", JSON.stringify(response));
-      setUser(response);
-    });
+    blogService
+      .login(loginData)
+      .then((response) => {
+        blogService.setToken(response.token);
+        window.localStorage.setItem("loggedUser", JSON.stringify(response));
+        setUser(response);
+      })
+      .catch((err) => {
+        setMessage({
+          message: `${err.response.data.error}`,
+          error: true,
+        });
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      });
   };
 
   const handleLogout = () => {
@@ -56,13 +70,34 @@ const App = () => {
 
   const createBlog = (e) => {
     e.preventDefault();
-    blogService.create(newBlog).then((response) => {
-      setBlogs((prev) => [...prev].concat(response));
-    });
+    let timer;
+    blogService
+      .create(newBlog)
+      .then((response) => {
+        setBlogs((prev) => [...prev].concat(response));
+        setMessage({
+          message: `${response.title} by ${user.name} added`,
+        });
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      })
+      .catch((err) => {
+        setMessage({
+          message: `${err.response.data.message}`,
+          error: true,
+        });
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      });
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
+      <Notification message={message} />
       {!user ? (
         <>
           <h2>login to application</h2>
@@ -117,6 +152,26 @@ const App = () => {
           ))}
         </>
       )}
+    </div>
+  );
+};
+
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        background: "grey",
+        border: message.error ? "5px solid red" : "5px solid green",
+        borderRadius: "5px",
+        color: message.error ? "red" : "green",
+        fontSize: "20px",
+      }}
+    >
+      <p>{message.message}</p>
     </div>
   );
 };
