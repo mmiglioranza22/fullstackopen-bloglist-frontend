@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [loginData, setLoginData] = useState({ username: "", password: "" });
-  const [newBlog, setNewBlog] = useState({ author: "", title: "", url: "" });
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState(null);
 
@@ -23,6 +27,8 @@ const App = () => {
     }
   }, [user]);
 
+  // Login logic --------
+  const [loginData, setLoginData] = useState({ username: "", password: "" });
   const handleChangeLoginForm = (ev) => {
     setLoginData((prev) => {
       return {
@@ -59,17 +65,10 @@ const App = () => {
     setUser(null);
   };
 
-  const handleCreateBlog = (ev) => {
-    setNewBlog((prev) => {
-      return {
-        ...prev,
-        [ev.target.name]: ev.target.value,
-      };
-    });
-  };
+  // Post blog logic ----
+  const blogRef = useRef();
 
-  const createBlog = (e) => {
-    e.preventDefault();
+  const createBlog = (newBlog) => {
     let timer;
     blogService
       .create(newBlog)
@@ -78,6 +77,7 @@ const App = () => {
         setMessage({
           message: `${response.title} by ${user.name} added`,
         });
+        blogRef.current.toggleVisibility();
         clearTimeout(timer);
         timer = setTimeout(() => {
           setMessage(null);
@@ -98,61 +98,93 @@ const App = () => {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Notification message={message} />
+      <h2>blogs</h2>
       {!user ? (
         <>
           <h2>login to application</h2>
-          <form onSubmit={handleLogin}>
-            <div>
-              <label htmlFor="username" name="username">
-                username
-              </label>
-              <input onChange={handleChangeLoginForm} name="username" />
-            </div>
-            <div>
-              <label htmlFor="password" name="password">
-                password
-              </label>
-              <input onChange={handleChangeLoginForm} name="password" />
-            </div>
-            <button type="submit">Login</button>
-          </form>
+          <LoginForm
+            handleLogin={handleLogin}
+            handleChangeLoginForm={handleChangeLoginForm}
+          />
         </>
       ) : (
         <>
-          <div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             <p>{user.name} logged in</p>
             <button style={{ width: "fit-content" }} onClick={handleLogout}>
               log out
             </button>
-            <form onSubmit={createBlog}>
-              <div>
-                <label htmlFor="title" name="title">
-                  title
-                </label>
-                <input onChange={handleCreateBlog} name="title" />
-              </div>
-              <div>
-                <label htmlFor="author" name="author">
-                  author
-                </label>
-                <input onChange={handleCreateBlog} name="author" />
-              </div>
-              <div>
-                <label htmlFor="url" name="url">
-                  url
-                </label>
-                <input onChange={handleCreateBlog} name="url" />
-              </div>
-              <button type="submit">create</button>
-            </form>
+            <Togglable buttonLabel="Create note" ref={blogRef}>
+              <BlogForm createBlog={createBlog} />
+            </Togglable>
+            {blogs.map((blog, i) => (
+              <Blog key={blog.id + "-" + i} blog={blog} />
+            ))}
           </div>
-          <h2>blogs</h2>
-          {blogs.map((blog, i) => (
-            <Blog key={blog.id + "-" + i} blog={blog} />
-          ))}
         </>
       )}
     </div>
+  );
+};
+
+const BlogForm = ({ createBlog }) => {
+  const [newBlog, setNewBlog] = useState({ author: "", title: "", url: "" });
+  const handleCreateBlog = (ev) => {
+    setNewBlog((prev) => {
+      return {
+        ...prev,
+        [ev.target.name]: ev.target.value,
+      };
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createBlog(newBlog);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="title" name="title">
+          title
+        </label>
+        <input onChange={handleCreateBlog} name="title" />
+      </div>
+      <div>
+        <label htmlFor="author" name="author">
+          author
+        </label>
+        <input onChange={handleCreateBlog} name="author" />
+      </div>
+      <div>
+        <label htmlFor="url" name="url">
+          url
+        </label>
+        <input onChange={handleCreateBlog} name="url" />
+      </div>
+      <button type="submit">create</button>
+    </form>
+  );
+};
+
+const LoginForm = ({ handleLogin, handleChangeLoginForm }) => {
+  return (
+    <form onSubmit={handleLogin}>
+      <div>
+        <label htmlFor="username" name="username">
+          username
+        </label>
+        <input onChange={handleChangeLoginForm} name="username" />
+      </div>
+      <div>
+        <label htmlFor="password" name="password">
+          password
+        </label>
+        <input onChange={handleChangeLoginForm} name="password" />
+      </div>
+      <button type="submit">Login</button>
+    </form>
   );
 };
 
@@ -175,5 +207,35 @@ const Notification = ({ message }) => {
     </div>
   );
 };
+
+// HOC
+const Togglable = forwardRef((props, refs) => {
+  const [visible, setVisible] = useState(false);
+
+  const hideWhenVisible = { display: visible ? "none" : "" };
+  const showWhenVisible = { display: visible ? "" : "none" };
+
+  const toggleVisibility = () => {
+    setVisible(!visible);
+  };
+  // Makes the child fn known for the parent in the ref.current
+  useImperativeHandle(refs, () => {
+    return {
+      toggleVisibility,
+    };
+  });
+
+  return (
+    <div>
+      <div style={hideWhenVisible}>
+        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+      </div>
+      <div style={showWhenVisible}>
+        {props.children}
+        <button onClick={toggleVisibility}>cancel</button>
+      </div>
+    </div>
+  );
+});
 
 export default App;
