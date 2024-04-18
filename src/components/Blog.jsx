@@ -1,7 +1,18 @@
 import { useState } from "react";
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, updateBlog, removeBlog }) => {
   const [toggleDetail, setToggleDetail] = useState(false);
+
+  const handleUpdateBlog = () => {
+    updateBlog(blog._id, { likes: blog.likes + 1 });
+  };
+
+  const handleRemoveBlog = () => {
+    if (window.confirm(`Remove blog ${blog.title} ${blog.author}?`)) {
+      removeBlog(blog._id);
+    }
+  };
+
   return (
     <div style={{ border: "1px solid black", maxWidth: "300px" }}>
       {blog.title} {blog.author}
@@ -11,8 +22,12 @@ const Blog = ({ blog }) => {
       {toggleDetail && (
         <div>
           <p>{blog.url}</p>
-          <p>likes {blog.likes}</p>
+          <div style={{ display: "flex" }}>
+            <p>likes {blog.likes}</p>
+            <button onClick={handleUpdateBlog}>like</button>
+          </div>
           <p>{blog.user.name}</p>
+          <button onClick={handleRemoveBlog}>remove</button>
         </div>
       )}
     </div>

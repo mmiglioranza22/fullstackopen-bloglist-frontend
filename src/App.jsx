@@ -23,7 +23,11 @@ const App = () => {
 
   useEffect(() => {
     if (user) {
-      blogService.getAll().then((blogs) => setBlogs(blogs));
+      blogService
+        .getAll()
+        .then((blogs) =>
+          setBlogs(blogs.sort((a, b) => (a.likes < b.likes ? 1 : -1)))
+        );
     }
   }, [user]);
 
@@ -95,6 +99,29 @@ const App = () => {
       });
   };
 
+  const updateBlog = (blogId, payload) => {
+    console.log("click");
+    blogService
+      .update(blogId, payload)
+      .then((response) => {
+        setBlogs(blogs.map((blog) => (blog._id === blogId ? response : blog)));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  const removeBlog = (blogId) => {
+    blogService
+      .remove(blogId)
+      .then((response) => {
+        setBlogs(blogs.filter((blog) => blog._id !== blogId));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Notification message={message} />
@@ -118,7 +145,12 @@ const App = () => {
               <BlogForm createBlog={createBlog} />
             </Togglable>
             {blogs.map((blog, i) => (
-              <Blog key={blog.id + "-" + i} blog={blog} />
+              <Blog
+                key={blog.id + "-" + i}
+                blog={blog}
+                updateBlog={updateBlog}
+                removeBlog={removeBlog}
+              />
             ))}
           </div>
         </>

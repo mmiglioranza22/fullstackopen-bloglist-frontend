@@ -28,4 +28,20 @@ const create = (payload) => {
   return request.then((response) => response.data);
 };
 
-export default { getAll, login, setToken, create };
+const update = (blogId, payload) => {
+  const config = {
+    headers: { Authorization: token },
+  };
+  const request = axios.patch(`${baseUrl}/${blogId}`, payload, config);
+  return request.then((response) => response.data);
+};
+
+const remove = (blogId, payload) => {
+  const config = {
+    headers: { Authorization: token },
+  };
+  const request = axios.delete(`${baseUrl}/${blogId}`, config);
+  return request.then((response) => response.data);
+};
+
+export default { getAll, login, setToken, create, update, remove };
