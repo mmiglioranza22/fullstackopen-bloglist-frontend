@@ -7,6 +7,7 @@ import {
 } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
+import PropTypes from "prop-types";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -269,5 +270,10 @@ const Togglable = forwardRef((props, refs) => {
     </div>
   );
 });
+Togglable.displayName = Togglable;
+
+Togglable.propTypes = {
+  buttonLabel: PropTypes.string.isRequired,
+};
 
 export default App;
