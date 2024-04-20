@@ -16,7 +16,10 @@ const Blog = ({ blog, updateBlog, removeBlog }) => {
   return (
     <div style={{ border: "1px solid black", maxWidth: "300px" }}>
       {blog.title} {blog.author}
-      <button onClick={() => setToggleDetail(!toggleDetail)}>
+      <button
+        onClick={() => setToggleDetail(!toggleDetail)}
+        data-testid="toggle-btn"
+      >
         {toggleDetail ? "hide" : "view"}
       </button>
       {toggleDetail && (
