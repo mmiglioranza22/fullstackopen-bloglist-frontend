@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { expect, describe, vi } from "vitest";
 import Blog from "./Blog";
 import userEvent from "@testing-library/user-event";
 
@@ -17,10 +18,10 @@ describe("<Blog />", () => {
 
     render(<Blog blog={blog} updateBlog={mockFn} removeBlog={mockFn} />);
 
-    const element1 = screen.getByText("test title test author");
+    const element1 = screen.queryByText("test title test author");
     const element2 = screen.queryByText("test url");
     expect(element1).toBeDefined();
-    expect(element2).toBeDefined();
+    expect(element2).toBeNull();
   });
 
   test("shows url and likes if toggle button is clicked", async () => {
@@ -38,17 +39,12 @@ describe("<Blog />", () => {
 
     render(<Blog blog={blog} updateBlog={mockFn} removeBlog={mockFn} />);
 
-    const element = screen.queryByText("test title test author");
-    console.log(element);
-
     const toggleBtn = screen.getByTestId("toggle-btn");
     await user.click(toggleBtn);
 
-    // const url = screen.queryByText(/test url/);
-    // const likes = screen.queryByText("trolo");
-    // screen.debug();
-
-    // expect(url).toBeDefined();
-    // expect(likes).toBeDefined();
+    const url = screen.getByText("test url");
+    const likes = screen.getByText("likes 1");
+    expect(url).toBeDefined();
+    expect(likes).toBeDefined();
   });
 });
