@@ -23,7 +23,6 @@ describe("<Blog />", () => {
     expect(element1).toBeDefined();
     expect(element2).toBeNull();
   });
-
   test("shows url and likes if toggle button is clicked", async () => {
     const blog = {
       title: "test title",
@@ -39,12 +38,35 @@ describe("<Blog />", () => {
 
     render(<Blog blog={blog} updateBlog={mockFn} removeBlog={mockFn} />);
 
-    const toggleBtn = screen.getByTestId("toggle-btn");
-    await user.click(toggleBtn);
+    const toggleButton = screen.getByTestId("toggle-btn");
+    await user.click(toggleButton);
 
     const url = screen.getByText("test url");
     const likes = screen.getByText("likes 1");
     expect(url).toBeDefined();
     expect(likes).toBeDefined();
+  });
+  test("if the like button is clicked twice, the event handler the component received as props is called twice", async () => {
+    const blog = {
+      title: "test title",
+      author: "test author",
+      url: "test url",
+      likes: 1,
+      user: {
+        name: "tester",
+      },
+    };
+    const mockFn = vi.fn();
+    const user = userEvent.setup();
+
+    render(<Blog blog={blog} updateBlog={mockFn} removeBlog={mockFn} />);
+
+    const toggleButton = screen.getByTestId("toggle-btn");
+    await user.click(toggleButton);
+    const likeButton = screen.getByTestId("like-btn");
+    await user.click(likeButton);
+    await user.click(likeButton);
+
+    expect(mockFn).toBeCalledTimes(2);
   });
 });

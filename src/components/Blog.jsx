@@ -27,7 +27,9 @@ const Blog = ({ blog, updateBlog, removeBlog }) => {
           <p>{blog.url}</p>
           <div style={{ display: "flex" }}>
             <p>likes {blog.likes}</p>
-            <button onClick={handleUpdateBlog}>like</button>
+            <button onClick={handleUpdateBlog} data-testid="like-btn">
+              like
+            </button>
           </div>
           <p>{blog.user.name}</p>
           <button onClick={handleRemoveBlog}>remove</button>

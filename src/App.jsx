@@ -8,6 +8,7 @@ import {
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import PropTypes from "prop-types";
+import BlogForm from "./components/BlogForm";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -157,47 +158,6 @@ const App = () => {
         </>
       )}
     </div>
-  );
-};
-
-const BlogForm = ({ createBlog }) => {
-  const [newBlog, setNewBlog] = useState({ author: "", title: "", url: "" });
-  const handleCreateBlog = (ev) => {
-    setNewBlog((prev) => {
-      return {
-        ...prev,
-        [ev.target.name]: ev.target.value,
-      };
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    createBlog(newBlog);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="title" name="title">
-          title
-        </label>
-        <input onChange={handleCreateBlog} name="title" />
-      </div>
-      <div>
-        <label htmlFor="author" name="author">
-          author
-        </label>
-        <input onChange={handleCreateBlog} name="author" />
-      </div>
-      <div>
-        <label htmlFor="url" name="url">
-          url
-        </label>
-        <input onChange={handleCreateBlog} name="url" />
-      </div>
-      <button type="submit">create</button>
-    </form>
   );
 };
 
