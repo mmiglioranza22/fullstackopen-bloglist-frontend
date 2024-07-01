@@ -18,10 +18,13 @@ describe("<Blog />", () => {
 
     render(<Blog blog={blog} updateBlog={mockFn} removeBlog={mockFn} />);
 
-    const element1 = screen.queryByText("test title test author");
-    const element2 = screen.queryByText("test url");
-    expect(element1).toBeDefined();
-    expect(element2).toBeNull();
+    const titleAuthor = screen.queryByText("test title test author");
+    const url = screen.queryByText("test url");
+    const likes = screen.queryByText("likes 1");
+
+    expect(titleAuthor).toBeDefined();
+    expect(url).toBeNull();
+    expect(likes).toBeNull();
   });
   test("shows url and likes if toggle button is clicked", async () => {
     const blog = {

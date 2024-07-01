@@ -1,14 +1,10 @@
-import {
-  useState,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-} from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
-import PropTypes from "prop-types";
 import BlogForm from "./components/BlogForm";
+import Notification from "./components/Notification";
+import LoginForm from "./components/LoginForms";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -24,6 +20,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    // should bring only those blogs related to the user
     if (user) {
       blogService
         .getAll()
@@ -102,7 +99,6 @@ const App = () => {
   };
 
   const updateBlog = (blogId, payload) => {
-    console.log("click");
     blogService
       .update(blogId, payload)
       .then((response) => {
@@ -159,81 +155,6 @@ const App = () => {
       )}
     </div>
   );
-};
-
-const LoginForm = ({ handleLogin, handleChangeLoginForm }) => {
-  return (
-    <form onSubmit={handleLogin}>
-      <div>
-        <label htmlFor="username" name="username">
-          username
-        </label>
-        <input onChange={handleChangeLoginForm} name="username" />
-      </div>
-      <div>
-        <label htmlFor="password" name="password">
-          password
-        </label>
-        <input onChange={handleChangeLoginForm} name="password" />
-      </div>
-      <button type="submit">Login</button>
-    </form>
-  );
-};
-
-const Notification = ({ message }) => {
-  if (message === null) {
-    return null;
-  }
-
-  return (
-    <div
-      style={{
-        background: "grey",
-        border: message.error ? "5px solid red" : "5px solid green",
-        borderRadius: "5px",
-        color: message.error ? "red" : "green",
-        fontSize: "20px",
-      }}
-    >
-      <p>{message.message}</p>
-    </div>
-  );
-};
-
-// HOC
-const Togglable = forwardRef((props, refs) => {
-  const [visible, setVisible] = useState(false);
-
-  const hideWhenVisible = { display: visible ? "none" : "" };
-  const showWhenVisible = { display: visible ? "" : "none" };
-
-  const toggleVisibility = () => {
-    setVisible(!visible);
-  };
-  // Makes the child fn known for the parent in the ref.current
-  useImperativeHandle(refs, () => {
-    return {
-      toggleVisibility,
-    };
-  });
-
-  return (
-    <div>
-      <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
-      </div>
-      <div style={showWhenVisible}>
-        {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
-      </div>
-    </div>
-  );
-});
-Togglable.displayName = Togglable;
-
-Togglable.propTypes = {
-  buttonLabel: PropTypes.string.isRequired,
 };
 
 export default App;
