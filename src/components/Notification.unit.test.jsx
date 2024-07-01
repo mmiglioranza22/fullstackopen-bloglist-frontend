@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { expect, describe, vi } from "vitest";
+import { expect, describe } from "vitest";
 import Notification from "./Notification";
 
 describe("<Notification />", () => {

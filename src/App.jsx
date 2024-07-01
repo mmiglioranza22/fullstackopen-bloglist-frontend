@@ -3,7 +3,7 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import BlogForm from "./components/BlogForm";
 import Notification from "./components/Notification";
-import LoginForm from "./components/LoginForms";
+import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
 
 const App = () => {
@@ -30,20 +30,13 @@ const App = () => {
     }
   }, [user]);
 
-  // Login logic --------
-  const [loginData, setLoginData] = useState({ username: "", password: "" });
-  const handleChangeLoginForm = (ev) => {
-    setLoginData((prev) => {
-      return {
-        ...prev,
-        [ev.target.name]: ev.target.value,
-      };
-    });
+  const handleLogout = () => {
+    window.localStorage.removeItem("loggedUser");
+    setUser(null);
   };
 
-  const handleLogin = (e) => {
+  const handleBlogService = (loginData) => {
     let timer;
-    e.preventDefault();
     blogService
       .login(loginData)
       .then((response) => {
@@ -61,11 +54,6 @@ const App = () => {
           setMessage(null);
         }, 5000);
       });
-  };
-
-  const handleLogout = () => {
-    window.localStorage.removeItem("loggedUser");
-    setUser(null);
   };
 
   // Post blog logic ----
@@ -127,10 +115,7 @@ const App = () => {
       {!user ? (
         <>
           <h2>login to application</h2>
-          <LoginForm
-            handleLogin={handleLogin}
-            handleChangeLoginForm={handleChangeLoginForm}
-          />
+          <LoginForm handleBlogService={handleBlogService} />
         </>
       ) : (
         <>
