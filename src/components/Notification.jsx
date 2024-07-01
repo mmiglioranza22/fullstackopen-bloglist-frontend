@@ -5,6 +5,7 @@ const Notification = ({ message }) => {
 
   return (
     <div
+      data-testid="notification"
       style={{
         background: "grey",
         border: message.error ? "5px solid red" : "5px solid green",
