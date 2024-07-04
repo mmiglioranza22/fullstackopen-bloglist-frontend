@@ -15,7 +15,7 @@ const tokenMiddleware = (request, response, next) => {
     request.token = authorization.replace("Bearer ", "");
     next();
   } else {
-    // else required to avoid Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client  
+    // else required to avoid Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
     next();
   }
 };
@@ -39,6 +39,10 @@ app.use(tokenMiddleware);
 app.use("/api/users", usersRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/blogs", userCheckMiddleware, blogRouter);
+if (process.env.NODE_ENV === "test") {
+  const testingRouter = require("./controllers/testing");
+  app.use("/api/testing", testingRouter);
+}
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
