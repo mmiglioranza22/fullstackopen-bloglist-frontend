@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 blogRouter.get("/", async (request, response, next) => {
   try {
-    const blogs = await Blog.find({}).populate("user", {
+    const blogs = await Blog.find({ user: request.userId }).populate("user", {
       username: 1,
       name: 1,
     });
@@ -46,7 +46,7 @@ blogRouter.delete("/:id", async (request, response, next) => {
       response.status(204).send();
     } else {
       response.status(403).json({
-        error: `user is not the creator of the blog and can't delete it`,
+        error: "user is not the creator of the blog and can't delete it",
       });
     }
   } catch (error) {
@@ -82,7 +82,7 @@ blogRouter.patch("/:id", async (request, response, next) => {
       response.status(200).json(updatedBlog);
     } else {
       response.status(403).json({
-        error: `user is not the creator of the blog and can't delete it`,
+        error: "user is not the creator of the blog and can't delete it",
       });
     }
   } catch (error) {

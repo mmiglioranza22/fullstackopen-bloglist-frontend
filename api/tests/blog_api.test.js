@@ -37,7 +37,6 @@ describe("API tests suite - BLOGS:", () => {
   beforeEach(async () => {
     await User.deleteMany({});
     await Blog.deleteMany({});
-    await Promise.all(initialBlogs.map((blog) => new Blog(blog).save()));
     const passwordHash = await generateHash(testUser.password);
     await User.create({ ...testUser, passwordHash });
     await api
@@ -48,6 +47,11 @@ describe("API tests suite - BLOGS:", () => {
         token = res.body.token;
         userId = res.body.id;
       });
+    await Promise.all(
+      initialBlogs
+        .map((blog) => ({ ...blog, user: userId }))
+        .map((blog) => new Blog(blog).save())
+    );
   });
   describe("1- fetching posts", () => {
     it("fetches blogs correctly", async () => {
