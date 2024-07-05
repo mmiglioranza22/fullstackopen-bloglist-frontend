@@ -64,7 +64,11 @@ const App = () => {
     blogService
       .create(newBlog)
       .then((response) => {
-        setBlogs((prev) => [...prev].concat(response));
+        setBlogs((prev) =>
+          [...prev]
+            .concat(response)
+            .sort((a, b) => (a.likes < b.likes ? 1 : -1))
+        );
         setMessage({
           message: `${response.title} by ${user.name} added`,
         });

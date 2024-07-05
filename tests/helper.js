@@ -27,3 +27,12 @@ export const createBlog = async (page, blog) => {
   // submit
   await page.getByTestId("submit-blog").click();
 };
+
+export const likeBlog = async (page, blog) => {
+  // get the specific blog by its text
+  const blogText = await page.getByText(`${blog.title} ${blog.author}`);
+  const blogParentContainer = await blogText.locator("..");
+  // click its view button
+  await blogParentContainer.getByRole("button", { name: "view" }).click();
+  await page.getByTestId("like-btn").click();
+};

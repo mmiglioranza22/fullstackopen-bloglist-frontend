@@ -22,6 +22,24 @@ const newBlog = {
   url: "localhost:8080",
 };
 
+const blogs = [
+  {
+    title: "New blog 1 will have 1 like",
+    author: testUser.name,
+    url: "localhost:8080",
+  },
+  {
+    title: "New blog 2 will have 3 likes",
+    author: testUser.name,
+    url: "localhost:8080",
+  },
+  {
+    title: "New blog 3 will have 2 likes",
+    author: testUser.name,
+    url: "localhost:8080",
+  },
+];
+
 describe("Blog app", () => {
   beforeEach(async ({ page, request }) => {
     await setupDatabaseAndRedirect({ page, request }, testUser);
@@ -86,8 +104,39 @@ describe("Blog app", () => {
 
         await expect(page.getByText("likes 1")).toBeVisible();
       });
+
+      test("an existing blog can be deleted only by the blog creator", async ({
+        page,
+      }) => {
+        page.on("dialog", async (dialog) => {
+          await dialog.accept();
+        });
+        await createBlog(page, newBlog);
+
+        await page.getByTestId("toggle-btn").click();
+
+        await page.getByTestId("remove-btn").click();
+
+        await expect(
+          page.getByText(`${newBlog.title} ${newBlog.author}`)
+        ).toBeHidden();
+      });
     });
   });
+
+  // describe("Creating blogs", () => {
+  //   beforeEach(async ({ page, request }) => {
+  //     await setupDatabaseAndRedirect({ page, request }, testUser);
+  //     await fillLoginFormAndLogin(page, testUser);
+  //     await createBlog(page, blogs[0]);
+  //     await createBlog(page, blogs[1]);
+  //     await createBlog(page, blogs[2]);
+  //   });
+
+  //   test("blogs are ordered by the amount of likes", async ({ page }) => {
+
+  //   });
+  // });
 });
 
 /**
