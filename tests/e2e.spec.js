@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
-const { fillLoginFormAndLogin } = require("./helper");
+const { fillLoginFormAndLogin, setupDatabaseAndRedirect } = require("./helper");
 
 const testUser = {
   name: "test user",
@@ -11,19 +11,16 @@ const fakeUser = {
   username: "non-existing:user",
   password: "wrongPassword",
 };
+
+const newBlog = {
+  title: "New blog",
+  author: testUser.name,
+  url: "localhost:8080",
+};
+
 describe("Blog app", () => {
   beforeEach(async ({ page, request }) => {
-    // clear DB and insert test user
-    await request.delete("http://localhost:5173/api/testing/reset");
-    await request.post("http://localhost:5173/api/users", {
-      data: {
-        name: testUser.name,
-        username: testUser.username,
-        password: testUser.password,
-      },
-    });
-    // redirect
-    await page.goto("http://localhost:5173");
+    await setupDatabaseAndRedirect({ page, request }, testUser);
   });
 
   test("Login form is shown", async ({ page }) => {
@@ -52,6 +49,33 @@ describe("Blog app", () => {
 
       await expect(errorNotification).toBeVisible();
       await expect(loginButton).toBeVisible();
+    });
+    describe("When logged in", () => {
+      beforeEach(async ({ page, request }) => {
+        await setupDatabaseAndRedirect({ page, request }, testUser);
+        await fillLoginFormAndLogin(page, testUser);
+      });
+
+      test("a new blog can be created", async ({ page }) => {
+        // open form
+        await page.getByTestId("hideWhenVisible-button").click();
+        // fill it
+        await page.getByTestId("title-input").fill(newBlog.title);
+        await page.getByTestId("author-input").fill(newBlog.author);
+        await page.getByTestId("url-input").fill(newBlog.url);
+        // submit
+        await page.getByTestId("submit-blog").click();
+
+        const successNotification = await page.getByText(
+          `${newBlog.title} by ${testUser.name} added`
+        );
+
+        await expect(successNotification).toBeVisible();
+        await expect(page.getByTestId("hideWhenVisible-button")).toBeVisible();
+        await expect(
+          page.getByText(`${newBlog.title} ${newBlog.author}`)
+        ).toBeVisible();
+      });
     });
   });
 });

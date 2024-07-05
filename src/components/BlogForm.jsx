@@ -44,7 +44,9 @@ const BlogForm = ({ createBlog }) => {
         </label>
         <input onChange={handleCreateBlog} name="url" data-testid="url-input" />
       </div>
-      <button type="submit">create</button>
+      <button type="submit" data-testid="submit-blog">
+        create
+      </button>
     </form>
   );
 };

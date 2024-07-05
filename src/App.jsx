@@ -124,7 +124,7 @@ const App = () => {
             <button style={{ width: "fit-content" }} onClick={handleLogout}>
               log out
             </button>
-            <Togglable buttonLabel="Create note" ref={blogRef}>
+            <Togglable buttonLabel="Create blog" ref={blogRef}>
               <BlogForm createBlog={createBlog} />
             </Togglable>
             {blogs.map((blog, i) => (
