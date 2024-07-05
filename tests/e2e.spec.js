@@ -1,5 +1,9 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
-const { fillLoginFormAndLogin, setupDatabaseAndRedirect } = require("./helper");
+const {
+  fillLoginFormAndLogin,
+  setupDatabaseAndRedirect,
+  createBlog,
+} = require("./helper");
 
 const testUser = {
   name: "test user",
@@ -29,6 +33,7 @@ describe("Blog app", () => {
     await expect(page.getByTestId("username-input")).toBeVisible();
     await expect(page.getByTestId("password-input")).toBeVisible();
   });
+
   describe("Login", () => {
     test("succeeds with correct credentials", async ({ page }) => {
       await fillLoginFormAndLogin(page, testUser);
@@ -57,14 +62,7 @@ describe("Blog app", () => {
       });
 
       test("a new blog can be created", async ({ page }) => {
-        // open form
-        await page.getByTestId("hideWhenVisible-button").click();
-        // fill it
-        await page.getByTestId("title-input").fill(newBlog.title);
-        await page.getByTestId("author-input").fill(newBlog.author);
-        await page.getByTestId("url-input").fill(newBlog.url);
-        // submit
-        await page.getByTestId("submit-blog").click();
+        await createBlog(page, newBlog);
 
         const successNotification = await page.getByText(
           `${newBlog.title} by ${testUser.name} added`
@@ -75,6 +73,18 @@ describe("Blog app", () => {
         await expect(
           page.getByText(`${newBlog.title} ${newBlog.author}`)
         ).toBeVisible();
+      });
+
+      test("an existing blog can be liked", async ({ page }) => {
+        await createBlog(page, newBlog);
+
+        await page.getByTestId("toggle-btn").click();
+
+        await expect(page.getByText("likes 0")).toBeVisible();
+
+        await page.getByTestId("like-btn").click();
+
+        await expect(page.getByText("likes 1")).toBeVisible();
       });
     });
   });

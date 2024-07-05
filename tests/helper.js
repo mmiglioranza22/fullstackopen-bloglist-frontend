@@ -16,3 +16,14 @@ export const fillLoginFormAndLogin = async (page, user) => {
   await page.getByTestId("password-input").fill(user.password);
   await page.getByTestId("button-submit").click();
 };
+
+export const createBlog = async (page, blog) => {
+  // open form
+  await page.getByTestId("hideWhenVisible-button").click();
+  // fill it
+  await page.getByTestId("title-input").fill(blog.title);
+  await page.getByTestId("author-input").fill(blog.author);
+  await page.getByTestId("url-input").fill(blog.url);
+  // submit
+  await page.getByTestId("submit-blog").click();
+};
