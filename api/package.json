@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon --env-file .env index.js",
-    "start": "NODE_ENV=production node index.js",
+    "start": "NODE_ENV=production node --env-file .env index.js",
     "start:test": "NODE_ENV=test node --env-file .env index.js",
     "test": "NODE_ENV=test node --env-file .env --test --test-concurrency=1 ./tests",
     "test:watch": "nodemon --exec 'npm test'",

@@ -31,9 +31,14 @@ const userCheckMiddleware = (request, response, next) => {
 };
 
 app.use(cors());
+app.use(express.static("dist"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("dev"));
+
+app.get("/health", (req, res) => {
+  res.send("ok");
+});
 
 app.use(tokenMiddleware);
 app.use("/api/users", usersRouter);
