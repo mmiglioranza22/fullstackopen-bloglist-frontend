@@ -13,7 +13,9 @@
     "test:report": "playwright show-report",
     "chromium": "npm run test:e2e -- --project chromium",
     "dev:server": "cd api && npm run dev",
-    "dev:start:test": "cd api && npm run start:test"
+    "dev:start:test": "cd api && npm run start:test",
+    "prod:server": "cd api && npm run start",
+    "start:prod": "cd api && npm run start:prod"
   },
   "dependencies": {
     "axios": "^1.4.0",
