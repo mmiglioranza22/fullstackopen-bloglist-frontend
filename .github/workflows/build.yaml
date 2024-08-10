@@ -36,6 +36,8 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: "0"
       - uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: npm ci && npm run build
       - name: App tests
         run: npm run test
       - name: Api tests
