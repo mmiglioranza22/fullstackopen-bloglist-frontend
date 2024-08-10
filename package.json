@@ -9,6 +9,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run ./src/components",
+    "api:test": "cd api && npm run test",
     "test:e2e": "playwright test",
     "test:report": "playwright show-report",
     "chromium": "npm run test:e2e -- --project chromium",

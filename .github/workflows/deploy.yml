@@ -1,1 +1,67 @@
-#
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+  workflow_run:
+    workflows: ["Test"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  check_skip_job:
+    runs-on:
+      ubuntu-20.04
+      # Map a step output to a job output
+    outputs:
+      output1: ${{ steps.checkSkip.outputs.shouldSkip }}
+    steps:
+      - name: "Check for #skip in commit"
+        id: checkSkip
+        env:
+          SKIP_WORKFLOW: ${{ contains(github.event.head_commit.message, '#skip') }}
+        run: |
+          echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}} "
+          echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
+
+  deploy_job:
+    runs-on: ubuntu-20.04
+    needs:
+      - check_skip_job
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Render Deployment
+        uses: sws2apps/render-deployment@v1.7.0
+        if: ${{ github.event_name == 'push' && !contains(needs.check_skip_job.outputs.output1, '#skip')}}
+        with:
+          serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
+          multipleDeployment: false
+
+  tag_release:
+    runs-on: ubuntu-22.04
+    needs:
+      - deploy_job
+    if: ${{ github.event_name == 'push' && !contains(needs.check_skip_job.outputs.output1, '#skip') }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: semver tag release
+        id: tagRelease
+        uses: anothrNick/github-tag-action@777684df761b882a3f4f70db16ac70d8cc78d0ea
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          PRERELEASE: true
+          DEFAULT_BUMP: "patch"

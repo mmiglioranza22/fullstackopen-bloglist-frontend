@@ -1,86 +1,27 @@
-# name: Build
+name: Build
 
-# on:
-#   push:
-#     branches:
-#       - main
-#   pull_request:
-#     branches: [main]
-#     types: [opened, synchronize]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
-# jobs:
-#   check_skip_job:
-#     runs-on:
-#       ubuntu-20.04
-#       # Map a step output to a job output
-#     outputs:
-#       output1: ${{ steps.checkSkip.outputs.shouldSkip }}
-#     steps:
-#       - name: "check for #skip in commit"
-#         id: checkSkip
-#         env:
-#           COMMITS: ${{ toJson(github.event.commits) }}
-#           SKIP_WORKFLOW: ${{ contains(github.event.head_commit.message, '#skip') }}
-#         run: echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
-
-#   simple_deployment_pipeline:
-#     runs-on: ubuntu-20.04
-#     needs: check_skip_job
-#     steps:
-#       - uses: actions/checkout@v4
-#         with:
-#           ref: ${{ github.event.pull_request.merge_commit_sha }}
-#           fetch-depth: "0"
-#       - uses: actions/setup-node@v4
-#         with:
-#           node-version: "20"
-#       - name: npm ci
-#         run: npm ci
-#       - name: lint
-#         run: npm run eslint
-#       - name: build
-#         id: buildStep
-#         run: npm run build
-
-#       - name: test
-#         run: npm run test
-#       - name: setup e2e:Install Playwright Browsers
-#         run: npx playwright install --with-deps
-#       - name: Run Playwright tests
-#         run: npm run test:e2e
-#       - name: check output
-#         env:
-#           OUTPUT1: ${{needs.check_skip_job.outputs.output1}}
-#         run: echo "ouput - $OUTPUT1"
-#       - name: Render Deployment
-#         uses: sws2apps/render-deployment@v1.7.0
-#         if: ${{ github.event_name == 'push' && !contains(needs.check_skip_job.outputs.output1, '#skip')}}
-#         with:
-#           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
-#           apiKey: ${{ secrets.RENDER_API_KEY }}
-#           multipleDeployment: false
-
-#   tag_release:
-#     runs-on: ubuntu-22.04
-#     needs:
-#       - simple_deployment_pipeline
-#       - check_skip_job
-#     if: ${{ github.event_name == 'push' && !contains(needs.check_skip_job.outputs.output1, '#skip') }}
-#     permissions:
-#       contents: write
-#     steps:
-#       - uses: actions/checkout@v4
-#         with:
-#           ref: ${{ github.event.pull_request.merge_commit_sha }}
-#           fetch-depth: "0"
-#       - uses: actions/setup-node@v4
-#         with:
-#           node-version: lts/*
-#       - name: semver tag release
-#         id: tagRelease
-#         uses: anothrNick/github-tag-action@777684df761b882a3f4f70db16ac70d8cc78d0ea
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#           WITH_V: true
-#           PRERELEASE: true
-#           DEFAULT_BUMP: "patch"
+jobs:
+  build_job:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install app dependencies
+        run: npm ci
+      - name: lint
+        run: Lint
+      - name: Build app and install deps for api
+        run: npm run build
