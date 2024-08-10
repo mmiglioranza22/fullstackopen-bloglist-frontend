@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.get("/health", (req, res) => {
+app.get("/health1", (req, res) => {
   res.send("ok");
 });
 
