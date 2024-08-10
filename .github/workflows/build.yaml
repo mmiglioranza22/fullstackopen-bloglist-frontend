@@ -42,10 +42,14 @@ jobs:
         run: npm run test
       - name: Api tests
         env:
-          TEST_MONGODB_URI: ${{ inputs.TEST_MONGODB_URI }}
-          PORT: ${{ inputs.PORT }}
-          SECRET: ${{ inputs.SECRET }}
-        run: npm run api:test
+          TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+          PORT: ${{ secrets.PORT }}
+          SECRET: ${{ secrets.SECRET }}
+        run: |
+          export TEST_MONGODB_URI=$TEST_MONGODB_URI 
+          export PORT=$PORT
+          export SECRET=$SECRET
+          npm run api:test
       # - name: Setup e2e:Install Playwright Browsers
       #   run: npx playwright install --with-deps
       # - name: Setup e2e:Spin api
