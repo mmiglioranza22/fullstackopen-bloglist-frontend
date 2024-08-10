@@ -21,7 +21,7 @@ jobs:
           node-version: "20"
       - name: Install app dependencies
         run: npm ci
-      - name: lint
-        run: Lint
+      - name: Lint
+        run: npm run lint
       - name: Build app and install deps for api
         run: npm run build
