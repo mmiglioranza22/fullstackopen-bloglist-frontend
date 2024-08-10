@@ -41,6 +41,10 @@ jobs:
       - name: App tests
         run: npm run test
       - name: Api tests
+        env:
+          TEST_MONGODB_URI: ${{ inputs.TEST_MONGODB_URI }}
+          PORT: ${{ inputs.PORT }}
+          SECRET: ${{ inputs.SECRET }}
         run: npm run api:test
       # - name: Setup e2e:Install Playwright Browsers
       #   run: npx playwright install --with-deps
