@@ -8,12 +8,13 @@ on:
     branches: [main]
     types: [opened, synchronize]
   workflow_run:
-    workflows: ["Test"]
+    workflows: ["Build-Test"]
     branches: [main]
     types: [completed]
 
 jobs:
   check_skip_job:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on:
       ubuntu-20.04
       # Map a step output to a job output
@@ -32,7 +33,6 @@ jobs:
     runs-on: ubuntu-20.04
     needs:
       - check_skip_job
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Render Deployment
         uses: sws2apps/render-deployment@v1.7.0
