@@ -1,4 +1,4 @@
-name: Build-Test
+name: Build-Test-Deploy
 
 on:
   push:
@@ -26,10 +26,9 @@ jobs:
       - name: Build app and install deps for api
         run: npm run build
 
-  test_app:
+  test_job:
     runs-on: ubuntu-20.04
-    needs:
-      - build_job
+    needs: build_job
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,3 +55,45 @@ jobs:
       #   run: npm run dev
       # - name: App e2e tests
       #   run: npm run chromiumb
+
+  deploy_job:
+    runs-on: ubuntu-20.04
+    needs: test_job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Render Deployment
+        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip')}}
+        uses: sws2apps/render-deployment@v1.7.0
+        with:
+          serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
+          multipleDeployment: false
+
+  tag_release:
+    if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip') }}
+    needs: [deploy_job]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: semver tag release
+        id: tagRelease
+        uses: anothrNick/github-tag-action@777684df761b882a3f4f70db16ac70d8cc78d0ea
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          PRERELEASE: true
+          DEFAULT_BUMP: "patch"
