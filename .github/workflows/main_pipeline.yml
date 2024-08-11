@@ -51,12 +51,12 @@ jobs:
         run: npx playwright install --with-deps
       - name: Setup e2e:Spin api
         run: >
-          export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
-          npm run workflow:start:test
-      - name: Setup e2e:Spin app
-        run: npm run dev
-      - name: App e2e tests
-        run: npm run chromium
+          (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' && 
+          export SECRET=${{secrets.SECRET}} && 
+          npm run workflow:start:test & sleep 5) && 
+          (npm run dev & sleep 5) && 
+          npm run chromium && 
+          killall -9 node
 
   deploy_job:
     runs-on: ubuntu-20.04
