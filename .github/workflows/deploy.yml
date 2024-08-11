@@ -33,13 +33,13 @@ jobs:
         env:
           COMMITS: ${{ toJson(github.event.commits) }}
           SKIP_WORKFLOW: ${{ contains(toJson(github.event.commits.*.message), '#skip') }}
-          CONTEXT: ${{ toJson(github) }}
+          CONTEXT: ${{ toJson(github.event) }}
 
         run: |
           echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
           echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
           echo "Commits message: ${{env.COMMITS}}"
-          echo "Commits message: ${{env.CONTEXT}}"
+          echo "Event : ${{env.CONTEXT}}"
 
       - name: Render Deployment
         if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip')}}
