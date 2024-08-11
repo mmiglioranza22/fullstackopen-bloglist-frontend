@@ -54,9 +54,10 @@ jobs:
           (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' && 
           export SECRET=${{secrets.SECRET}} && 
           export PORT=${{secrets.PORT}} && 
-          npm run workflow:start:test & npm run dev & sleep 5) && 
-          DEBUG=pw:browser npm run test:e2e &&
-          kill -9 $(lsof -t -i:${{secrets.PORT}})
+          npm run workflow:start:test & sleep 5) && 
+          DEBUG=pw:browser npm run test:e2e
+
+        # && kill -9 $(lsof -t -i:${{secrets.PORT}})
 
   deploy_job:
     runs-on: ubuntu-20.04
