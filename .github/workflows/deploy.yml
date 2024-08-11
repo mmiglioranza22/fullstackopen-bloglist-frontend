@@ -13,31 +13,19 @@ on:
     types: [completed]
 
 jobs:
-  check_skip_job:
+  deploy_job:
+    runs-on: ubuntu-20.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on:
-      ubuntu-20.04
-      # Map a step output to a job output
-    # outputs:
-    #   shouldSkip: ${{ steps.checkSkip.outputs.shouldSkip }}
     steps:
       - name: "Check for #skip in commit"
         id: checkSkip
         env:
           SKIP_WORKFLOW: ${{ contains(github.event.head_commit.message, '#skip') }}
         run: |
-          echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}} "
-          echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
-
-  deploy_job:
-    runs-on: ubuntu-20.04
-    needs:
-      - check_skip_job
-    steps:
+          echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
+          echo "Commit message: ${{github.event.head_commit.message}}"
       - name: Render Deployment
         uses: sws2apps/render-deployment@v1.7.0
-        # if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip')}}
-
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
@@ -46,9 +34,8 @@ jobs:
   tag_release:
     runs-on: ubuntu-22.04
     needs:
-      - check_skip_job
       - deploy_job
-    # if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, '#skip') }}
+    if: ${{ needs.deploy_job.result == 'success' && !contains(github.event.head_commit.message, '#skip') }}
     permissions:
       contents: write
     steps:
