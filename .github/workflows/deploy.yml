@@ -33,10 +33,14 @@ jobs:
         env:
           COMMITS: ${{ toJson(github.event.commits) }}
           SKIP_WORKFLOW: ${{ contains(toJson(github.event.commits.*.message), '#skip') }}
+          CONTEXT: ${{ toJson(github) }}
+
         run: |
           echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
           echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
           echo "Commits message: ${{env.COMMITS}}"
+          echo "Commits message: ${{env.CONTEXT}}"
+
       - name: Render Deployment
         if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip')}}
         uses: sws2apps/render-deployment@v1.7.0
