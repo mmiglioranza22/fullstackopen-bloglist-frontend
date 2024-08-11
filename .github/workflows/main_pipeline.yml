@@ -53,8 +53,7 @@ jobs:
         run: >
           (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' && 
           export SECRET=${{secrets.SECRET}} && 
-          npm run workflow:start:test & 
-          npm run dev & sleep 2) && 
+          npm run workflow:start:test & sleep 2) && 
           npm run chromium
 
   deploy_job:
