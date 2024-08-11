@@ -55,7 +55,7 @@ jobs:
           export SECRET=${{secrets.SECRET}} &&
           npm run workflow:start:test & 
           npm run dev & sleep 2) &&
-          PORT=3003 npm run chromium && killall -9 node
+          npm run chromium && killall -9 node
 
   deploy_job:
     runs-on: ubuntu-20.04
