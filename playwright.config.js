@@ -74,9 +74,9 @@ module.exports = defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: !process.env.CI
-      ? "npm run dev:start:test"
-      : "npm run workflow:start:test",
+    // command: !process.env.CI
+    //   ? "npm run dev:start:test"
+    //   : "npm run workflow:start:test",
     url: "http://127.0.0.1:6969",
   },
 });
