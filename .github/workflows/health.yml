@@ -1,13 +1,13 @@
 name: Health check
 
 on:
-  # push:
-  #   branches:
-  #     - main
-  workflow_run:
-    workflows: ["Deploy"]
-    branches: [main]
-    types: [completed]
+  push:
+    branches:
+      - main
+  # workflow_run:
+  #   workflows: ["Deploy"]
+  #   branches: [main]
+  #   types: [completed]
   # schedule:
   #   # * is a special character in YAML so you have to quote this string
   #   - cron: "0 */1 * * *" # fire every 2 hours at the start of that specific hour
