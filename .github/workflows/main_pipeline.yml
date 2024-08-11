@@ -52,10 +52,8 @@ jobs:
       - name: Setup e2e:Spin api
         run: >
           (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' && 
-          export SECRET=${{secrets.SECRET}} && 
-          export PORT=${{secrets.PORT}} && 
-          npm run workflow:start:test & sleep 5) && 
-          DEBUG=pw:browser npm run test:e2e
+          export SECRET=${{secrets.SECRET}} &&  
+          npm run dev & sleep 2) && npm run test:e2e && killall -9 node
 
         # && kill -9 $(lsof -t -i:${{secrets.PORT}})
 
