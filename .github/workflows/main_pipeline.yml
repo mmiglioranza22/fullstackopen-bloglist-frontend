@@ -55,7 +55,7 @@ jobs:
           export SECRET=${{secrets.SECRET}} && 
           export PORT=${{secrets.PORT}} && 
           npm run workflow:start:test & sleep 2) && 
-          npm run chromium
+          DEBUG=pw:browser npm run test:e2e
 
   deploy_job:
     runs-on: ubuntu-20.04
