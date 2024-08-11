@@ -77,6 +77,6 @@ module.exports = defineConfig({
     command: !process.env.CI
       ? "npm run dev:start:test"
       : "npm run workflow:start:test",
-    url: "http://127.0.0.1:5000",
+    url: "http://127.0.0.1:6969",
   },
 });
