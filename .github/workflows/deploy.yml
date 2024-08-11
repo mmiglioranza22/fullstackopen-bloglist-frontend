@@ -9,16 +9,36 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  deploy_job:
+  check_skip_job:
     runs-on: ubuntu-20.04
+    outputs:
+      output1: ${{ steps.checkSkip.outputs.shouldSkip }}
     steps:
-      - name: "Check for #skip in commit"
+      - name: "check for #skip in commit"
         id: checkSkip
         env:
-          SKIP_WORKFLOW: ${{ contains(github.event.head_commit.message, '#skip') }}
+          COMMITS: ${{ toJson(github.event.commits) }}
+          SKIP_WORKFLOW: ${{ contains(toJson(github.event.commits.*.message), '#skip') }}
         run: |
+          echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
           echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
-          echo "Commit message: ${{github.event.head_commit.message}}"
+          echo "Commits message: ${{env.COMMITS}}"
+
+  deploy_job:
+    runs-on: ubuntu-20.04
+    needs: check_skip_job
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: check output
+        env:
+          OUTPUT1: ${{needs.check_skip_job.outputs.output1}}
+        run: echo "ouput - $OUTPUT1"
       - name: Render Deployment
         if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip')}}
         uses: sws2apps/render-deployment@v1.7.0
