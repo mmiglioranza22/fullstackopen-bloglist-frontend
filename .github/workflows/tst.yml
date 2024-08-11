@@ -1,0 +1,55 @@
+name: Testing stuff
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  a_test_job:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: commits
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+        run: echo "$COMMITS"
+
+      - name: commit messages
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+          SKIP_WORKFLOW: ${{ contains(github.event.head_commit.message, '#skip') }}
+        run: |
+          echo "COMMITS - $COMMITS"
+                    echo "SKIP_WORKFLOW - $SKIP_WORKFLOW"
+
+      # - name: Print vars
+      #   env:
+      #     AUTHOR: ${{ github.event.head_commit.author.username }}
+      #     COMMIT_URL: ${{ github.event.head_commit.url }}
+      #     TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+
+      #   run: echo "AUTHOR - $AUTHOR \n COMMIT_URL - $COMMIT_URL"
+
+      # - name: Discord notification
+      #   uses: Ilshidur/action-discord@0.3.2
+      #   env:
+      #     DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      #     DISCORD_USERNAME: MrRoboto
+
+      #     DISCORD_EMBEDS: '[{"author":{"icon_url":"https://avatars.githubusercontent.com/${{ github.actor }}","name":"${{ github.actor }}","url":"https://github.com/${{github.actor}}"},"url":"https://github.com/${{github.repository}}/commit/${{github.sha}}","fields":[{"name":"Repository","value":"[${{github.event.repository.name}}](${{github.event.repository.clone_url}})","inline":true},{"name":"Branch","value":"[${{github.ref_name}}](https://github.com/${{github.repository}}/tree/${{github.ref_name}})","inline":true},{"name":"Event","value":"${{github.event_name}}","inline":true},{"name":"Job","value":"${{github.job}}","inline":true},{"name":"Commit Message","value":"[${{ github.sha }}](https://github.com/${{github.repository}}/commit/${{github.sha}}) - `${{github.event.head_commit.message}}`"},{"name":"Changed Files","value":"${{ steps.changed-files.outputs.all_changed_files }}"},{"name":"Author","value":"[${{github.event.head_commit.author.name}}](https://github.com/${{github.actor}})"}],"color":1127128,"timestamp":"${{github.event.head_commit.timestamp}}","footer":{"text":"${{github.event.head_commit.timestamp}}"}}]'
+
+      #   with:
+      #     args:
+      #       "New version deploy success."
+      #       # args: '"${{github.event.repository.name}}: Build ${{github.run_number}} has ${{ steps.build-and-push.outcome == "success && "passed!" || "failed." }}"'
