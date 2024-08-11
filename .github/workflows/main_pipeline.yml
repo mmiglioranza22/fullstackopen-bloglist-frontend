@@ -50,14 +50,14 @@ jobs:
           export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
           npm run api:test
         # e2e test are run locally for now, could not found a way to run them in the worklow
-      - name: Setup e2e:Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Setup e2e:Spin api
-        run: >
-          (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
-          export SECRET=${{secrets.SECRET}} &&
-          npm run dev & sleep 2) &&
-          DEBUG=pw:api npm run chromium && kill -9 $(lsof -t -i:5173)
+      # - name: Setup e2e:Install Playwright Browsers
+      #   run: npx playwright install --with-deps
+      # - name: Setup e2e:Spin api
+      #   run: >
+      #     (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
+      #     export SECRET=${{secrets.SECRET}} &&
+      #     npm run dev & sleep 2) &&
+      #     DEBUG=pw:api npm run chromium && kill -9 $(lsof -t -i:5173)
 
   deploy_job:
     runs-on: ubuntu-20.04
