@@ -36,7 +36,7 @@ jobs:
     steps:
       - name: Render Deployment
         uses: sws2apps/render-deployment@v1.7.0
-        if: ${{ github.event_name == 'push' && needs.check_skip_job.outputs.shouldSkip == 'false'}}
+        if: ${{ github.event_name == 'push' && !needs.check_skip_job.outputs.shouldSkip}}
 
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
@@ -46,8 +46,9 @@ jobs:
   tag_release:
     runs-on: ubuntu-22.04
     needs:
+      - check_skip_job
       - deploy_job
-    if: ${{ github.event_name == 'push' && needs.check_skip_job.outputs.shouldSkip == 'false' }}
+    if: ${{ github.event_name == 'push' && !needs.check_skip_job.outputs.shouldSkip }}
     permissions:
       contents: write
     steps:
@@ -65,4 +66,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           PRERELEASE: true
-          DEFAULT_BUMP: "patch"
+          DEFAULT_BUMP: "minor"
