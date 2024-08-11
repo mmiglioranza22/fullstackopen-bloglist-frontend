@@ -52,8 +52,7 @@ jobs:
       - name: Setup e2e:Spin api
         run: >
           (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
-          export SECRET=${{secrets.SECRET}} &&
-          npm run workflow:start:test & 
+          export SECRET=${{secrets.SECRET}} && 
           npm run dev & sleep 2) &&
           npm run chromium && killall -9 node
 
