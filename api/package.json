@@ -11,7 +11,7 @@
     "test": "NODE_ENV=test node --env-file .env --test --test-concurrency=1 ./tests",
     "test:watch": "nodemon --exec 'npm test'",
     "jest": "NODE_ENV=test jest --verbose --runInBand --runTestsByPath __tests__/*",
-    "api:test": "node --test --test-concurrency=1 ./tests"
+    "api:test": "NODE_ENV=test node --test --test-concurrency=1 ./tests"
   },
   "keywords": [],
   "author": "",

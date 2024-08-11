@@ -45,10 +45,8 @@ jobs:
           TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
           PORT: ${{ secrets.PORT }}
           SECRET: ${{ secrets.SECRET }}
-        run: |
-          export TEST_MONGODB_URI='$TEST_MONGODB_URI' 
-          export PORT='$PORT'
-          export SECRET='$SECRET'
+        run: >
+          export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}'
           npm run api:test
       # - name: Setup e2e:Install Playwright Browsers
       #   run: npx playwright install --with-deps
