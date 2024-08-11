@@ -19,7 +19,7 @@ jobs:
       ubuntu-20.04
       # Map a step output to a job output
     outputs:
-      output1: ${{ steps.checkSkip.outputs.shouldSkip }}
+      shouldSkip: ${{ steps.checkSkip.outputs.shouldSkip }}
     steps:
       - name: "Check for #skip in commit"
         id: checkSkip
@@ -36,7 +36,8 @@ jobs:
     steps:
       - name: Render Deployment
         uses: sws2apps/render-deployment@v1.7.0
-        if: ${{ github.event_name == 'push' && !contains(needs.check_skip_job.outputs.output1, '#skip')}}
+        if: ${{ github.event_name == 'push' && needs.check_skip_job.outputs.shouldSkip == 'false'}}
+
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
           apiKey: ${{ secrets.RENDER_API_KEY }}
@@ -46,7 +47,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs:
       - deploy_job
-    if: ${{ github.event_name == 'push' && !contains(needs.check_skip_job.outputs.output1, '#skip') }}
+    if: ${{ github.event_name == 'push' && needs.check_skip_job.outputs.shouldSkip == 'false' }}
     permissions:
       contents: write
     steps:
