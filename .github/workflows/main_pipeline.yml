@@ -47,14 +47,14 @@ jobs:
         run: >
           export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
           npm run api:test
-      # - name: Setup e2e:Install Playwright Browsers
-      #   run: npx playwright install --with-deps
-      # - name: Setup e2e:Spin api
-      #   run: npm run dev:start:test
-      # - name: Setup e2e:Spin app
-      #   run: npm run dev
-      # - name: App e2e tests
-      #   run: npm run chromiumb
+      - name: Setup e2e:Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Setup e2e:Spin api
+        run: npm run dev:start:test
+      - name: Setup e2e:Spin app
+        run: npm run dev
+      - name: App e2e tests
+        run: npm run chromium
 
   deploy_job:
     runs-on: ubuntu-20.04
