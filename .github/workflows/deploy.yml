@@ -25,6 +25,8 @@ jobs:
           echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
           echo "Commit message: ${{github.event.head_commit.message}}"
       - name: Render Deployment
+        if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip')}}
+
         uses: sws2apps/render-deployment@v1.7.0
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
@@ -32,10 +34,9 @@ jobs:
           multipleDeployment: false
 
   tag_release:
+    if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip') }}
+    needs: [deploy_job]
     runs-on: ubuntu-22.04
-    needs:
-      - deploy_job
-    if: ${{ needs.deploy_job.result == 'success' && !contains(github.event.head_commit.message, '#skip') }}
     permissions:
       contents: write
     steps:
@@ -53,4 +54,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
           PRERELEASE: true
-          DEFAULT_BUMP: "minor"
+          DEFAULT_BUMP: "patch"
