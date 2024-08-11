@@ -7,6 +7,14 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize]
+  workflow_run:
+    workflows: ["Build-Test"]
+    branches: [main]
+    types: [completed]
+
+concurrency:
+  group: ${{ github.head_ref }}-init
+  cancel-in-progress: true
 
 jobs:
   check_skip_job:
@@ -27,6 +35,7 @@ jobs:
   deploy_job:
     runs-on: ubuntu-20.04
     needs: check_skip_job
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
         with:

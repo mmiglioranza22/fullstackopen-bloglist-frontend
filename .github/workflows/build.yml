@@ -1,12 +1,6 @@
 name: Build-Test
 
 on:
-  # Resusable workflow
-  workflow_call:
-    inputs:
-      config-path:
-        required: true
-        type: string
   push:
     branches:
       - main
