@@ -26,7 +26,6 @@ jobs:
           echo "Commit message: ${{github.event.head_commit.message}}"
       - name: Render Deployment
         if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip')}}
-
         uses: sws2apps/render-deployment@v1.7.0
         with:
           serviceId: ${{ secrets.RENDER_SERVICE_ID }}
