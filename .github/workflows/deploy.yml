@@ -17,56 +17,66 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy_job:
-    runs-on: ubuntu-20.04
+  on-success:
+    runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
-          fetch-depth: "0"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: "check for #skip in commit"
-        id: checkSkip
-        env:
-          COMMITS: ${{ toJson(github.event.commits) }}
-          SKIP_WORKFLOW: ${{ contains(toJson(github.event.workflow_run.head_commit.message), '#skip') }}
-          CONTEXT: ${{ github.event.workflow_run.head_commit.message }}
-
-        run: |
-          echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
-          echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
-          echo "Commits message: ${{env.COMMITS}}"
-          echo "Event : ${{env.CONTEXT}}"
-      - name: Render Deployment
-        if: ${{ github.event_name == 'push' && !contains(github.event.workflow_run.head_commit.message, '#skip')}}
-        uses: sws2apps/render-deployment@v1.7.0
-        with:
-          serviceId: ${{ secrets.RENDER_SERVICE_ID }}
-          apiKey: ${{ secrets.RENDER_API_KEY }}
-          multipleDeployment: false
-
-  tag_release:
-    if: ${{ github.event_name == 'push' && !contains(github.event.workflow_run.head_commit.message, '#skip') }}
-    needs: [deploy_job]
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
+      - run: echo 'The triggering workflow passed'
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
-          fetch-depth: "0"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: semver tag release
-        id: tagRelease
-        uses: anothrNick/github-tag-action@777684df761b882a3f4f70db16ac70d8cc78d0ea
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          PRERELEASE: true
-          DEFAULT_BUMP: "patch"
+      - run: echo 'The triggering workflow failed'
+
+  # deploy_job:
+  #   runs-on: ubuntu-20.04
+  #   if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ github.event.pull_request.merge_commit_sha }}
+  #         fetch-depth: "0"
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: "check for #skip in commit"
+  #       id: checkSkip
+  #       env:
+  #         COMMITS: ${{ toJson(github.event.commits) }}
+  #         SKIP_WORKFLOW: ${{ contains(toJson(github.event.workflow_run.head_commit.message), '#skip') }}
+  #         CONTEXT: ${{ github.event.workflow_run.head_commit.message }}
+  #       run: |
+  #         echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
+  #         echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
+  #         echo "Commits message: ${{env.COMMITS}}"
+  #         echo "Event : ${{env.CONTEXT}}"
+  #     - name: Render Deployment
+  #       if: ${{ github.event_name == 'push' && !contains(github.event.workflow_run.head_commit.message, '#skip')}}
+  #       uses: sws2apps/render-deployment@v1.7.0
+  #       with:
+  #         serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+  #         apiKey: ${{ secrets.RENDER_API_KEY }}
+  #         multipleDeployment: false
+
+  # tag_release:
+  #   if: ${{ github.event_name == 'push' && !contains(github.event.workflow_run.head_commit.message, '#skip') }}
+  #   needs: [deploy_job]
+  #   runs-on: ubuntu-22.04
+  #   permissions:
+  #     contents: write
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ github.event.pull_request.merge_commit_sha }}
+  #         fetch-depth: "0"
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: lts/*
+  #     - name: semver tag release
+  #       id: tagRelease
+  #       uses: anothrNick/github-tag-action@777684df761b882a3f4f70db16ac70d8cc78d0ea
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         WITH_V: true
+  #         PRERELEASE: true
+  #         DEFAULT_BUMP: "patch"
