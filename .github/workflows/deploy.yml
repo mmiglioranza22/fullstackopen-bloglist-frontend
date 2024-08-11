@@ -33,7 +33,7 @@ jobs:
         env:
           COMMITS: ${{ toJson(github.event.commits) }}
           SKIP_WORKFLOW: ${{ contains(toJson(github.event.commits.*.message), '#skip') }}
-          CONTEXT: ${{ toJson(github.event) }}
+          CONTEXT: ${{ toJson(github.event.workflow_run.head_commit.message) }}
 
         run: |
           echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
