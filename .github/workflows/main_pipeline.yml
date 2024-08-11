@@ -55,7 +55,7 @@ jobs:
           (export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
           export SECRET=${{secrets.SECRET}} &&
           npm run dev & sleep 2) &&
-          npm run chromium && kill -9 $(lsof -t -i:5173)
+          DEBUG=pw:api npm run chromium && kill -9 $(lsof -t -i:5173)
 
   deploy_job:
     runs-on: ubuntu-20.04
