@@ -17,24 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check_skip_job:
-    runs-on: ubuntu-20.04
-    outputs:
-      output1: ${{ steps.checkSkip.outputs.shouldSkip }}
-    steps:
-      - name: "check for #skip in commit"
-        id: checkSkip
-        env:
-          COMMITS: ${{ toJson(github.event.commits) }}
-          SKIP_WORKFLOW: ${{ contains(toJson(github.event.commits.*.message), '#skip') }}
-        run: |
-          echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
-          echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
-          echo "Commits message: ${{env.COMMITS}}"
-
   deploy_job:
     runs-on: ubuntu-20.04
-    needs: check_skip_job
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
@@ -44,11 +28,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - uses: ./.github/workflows/build.yml
-      - name: check output
+      - name: "check for #skip in commit"
+        id: checkSkip
         env:
-          OUTPUT1: ${{needs.check_skip_job.outputs.output1}}
-        run: echo "ouput - $OUTPUT1"
+          COMMITS: ${{ toJson(github.event.commits) }}
+          SKIP_WORKFLOW: ${{ contains(toJson(github.event.commits.*.message), '#skip') }}
+        run: |
+          echo "shouldSkip=$SKIP_WORKFLOW" >> "$GITHUB_OUTPUT"
+          echo "Deploy will be skipped: ${{env.SKIP_WORKFLOW}}"
+          echo "Commits message: ${{env.COMMITS}}"
       - name: Render Deployment
         if: ${{ github.event_name == 'push' && !contains(toJson(github.event.commits.*.message), '#skip')}}
         uses: sws2apps/render-deployment@v1.7.0
