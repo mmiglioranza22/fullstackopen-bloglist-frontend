@@ -19,14 +19,14 @@ concurrency:
 jobs:
   on-success:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ !contains(github.event.workflow_run.head_commit.message, '#skip')}}
     steps:
-      - run: echo 'The triggering workflow passed'
+      - run: echo "'The triggering workflow passed' ${{!contains(github.event.workflow_run.head_commit.message, '#skip')}}"
   on-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    if: ${{ contains(github.event.workflow_run.head_commit.message, '#skip') }}
     steps:
-      - run: echo 'The triggering workflow failed'
+      - run: echo "'The triggering workflow failed' ${{contains(github.event.workflow_run.head_commit.message, '#skip')}}"
 
   # deploy_job:
   #   runs-on: ubuntu-20.04
