@@ -35,6 +35,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - uses: ./.github/workflows/build.yml
       - name: check output
         env:
           OUTPUT1: ${{needs.check_skip_job.outputs.output1}}
