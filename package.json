@@ -16,7 +16,8 @@
     "dev:server": "cd api && npm run dev",
     "dev:start:test": "cd api && npm run start:test",
     "prod:server": "cd api && npm run start",
-    "start:prod": "cd api && npm run start:prod"
+    "start:prod": "cd api && npm run start:prod",
+    "workflow:start:test": "cd api && npm run workflow:start:test"
   },
   "dependencies": {
     "axios": "^1.4.0",

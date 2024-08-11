@@ -50,7 +50,9 @@ jobs:
       - name: Setup e2e:Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Setup e2e:Spin api
-        run: npm run dev:start:test
+        run: >
+          export TEST_MONGODB_URI='${{secrets.TEST_MONGODB_URI}}' &&
+          npm run workflow:start:test
       - name: Setup e2e:Spin app
         run: npm run dev
       - name: App e2e tests
