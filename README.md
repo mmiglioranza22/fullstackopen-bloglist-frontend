@@ -10,7 +10,6 @@ Currently, two official plugins are available:
 ```
 Run e2e locally.
 in order:
-	- npm run dev:start:test
 	- npm run dev
 	- npm run test:e2e or npm run chromium
 ```
