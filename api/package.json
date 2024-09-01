@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev:container": "NODE_ENV=development nodemon index.js",
     "dev": "NODE_ENV=development nodemon --env-file .env index.js",
     "start": "NODE_ENV=production node --env-file .env index.js",
     "start:prod": "node index.js",
