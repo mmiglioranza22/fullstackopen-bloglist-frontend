@@ -1,11 +1,6 @@
-# React + Vite
+# fullstackopen - [Part 4 (Testing Express)](https://fullstackopen.com/en/part4), [Part 5 (Testing React)](https://fullstackopen.com/en/part5) and [Part 11 (CI/CD)](https://fullstackopen.com/en/part11/expanding_further#exercises-11-19-11-21)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+App used for the mentioned parts of the University of Helsinki MOOC course
 
 ```
 Run e2e locally.
